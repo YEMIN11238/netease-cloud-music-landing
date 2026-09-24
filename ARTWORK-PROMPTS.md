@@ -1,6 +1,6 @@
 # 原创图像记录
 
-以下两项由内置 imagegen 生成，每项一次，未调用 API/CLI 后备方案。网站文件为 `dist/assets/vinyl-crimson.png` 和 `dist/assets/cloud-transition.png`。
+以下两项由内置 imagegen 生成，每项一次，未调用 API/CLI 后备方案。网站文件为 `assets/vinyl-crimson.png` 和 `assets/cloud-transition.png`。
 
 ## 黑胶唱片
 

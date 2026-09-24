@@ -8,7 +8,7 @@ The opening now uses an original lightweight WebGL image treatment: slow surface
 
 Only desktop is in scope. All reference effects are independently implemented; Goodpatch assets, mascot, brand identity and website source were not copied. The opening is an animated still-image composition, not a supplied video or a true 3D scene. The original Orange Horse and CARGOX-inspired interactions remain where compatible; the old two-screen smoke layout is superseded by the new reference.
 
-Hero: `dist/assets/music-hero-red.png`, 1672 × 941 pixels. Generated with built-in imagegen, one request, no variants. Source output retained in `../outputs/music-hero-red.png`.
+Hero: `assets/music-hero-red.png`, 1672 × 941 pixels. Generated with built-in imagegen, one request, no variants. The source output is not included in this repository.
 
 ## Final generation prompt
 
