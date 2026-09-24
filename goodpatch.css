@@ -1,0 +1,149 @@
+/* Desktop art direction. Scoped specificity supersedes the earlier concept. */
+html:root{--paper:#f0f1f3;--red:#e72b36;--ink:#252729;--muted:#74777a;color-scheme:light}
+html body{background:var(--paper);font-family:Arial,"PingFang SC","Microsoft YaHei",sans-serif}
+html h2{font-family:Arial,"PingFang SC",sans-serif;font-weight:650;letter-spacing:-.055em;line-height:1.13}
+html .page{scroll-behavior:auto;scrollbar-color:#999 var(--paper);min-width:1024px}
+html .eyebrow,html .section-top{font-size:12px;letter-spacing:1px}
+html .full-screen{min-height:650px}
+html body>.site-header{height:90px;padding:15px 3.2vw;border-bottom:1px solid #ffffff38;background:transparent;backdrop-filter:none;transition:transform .5s,background .35s,color .35s}
+html .desktop-nav{gap:36px;font-size:14px}
+html .header-actions{gap:22px}
+html .menu-button{background:#fff;color:#252729;padding:11px 20px;border-radius:40px;font-size:13px}
+html .menu-button span{font-size:17px}
+html .motion-toggle{font-size:12px;color:inherit}
+html .header-light>.site-header{background:#f0f1f3eb;color:#252729;border-color:#25272918;backdrop-filter:blur(18px)}
+html .official-wordmark{display:flex;align-items:center;gap:8px;background:none;width:176px;filter:none}
+html .brand-symbol{width:33px;height:33px;border-radius:50%;flex-shrink:0}
+html .brand-name{display:block;width:135px;height:54px;background:url('assets/netease-topbar.png') -40px -7px no-repeat}
+html .header-light .brand-name{filter:brightness(0)}
+html .header-light .menu-button{background:#252729;color:white}
+html .header-hidden>.site-header{transform:translateY(-100%)}
+html .chapter-rail{right:12px;opacity:.75;transform:translateY(-50%) scale(.85)}
+html .opening-story{height:260svh;position:relative;background:var(--paper);color:var(--ink)}
+html .opening-stage{position:sticky;top:0;height:100svh;min-height:600px;overflow:hidden;isolation:isolate}
+html .music-orb{position:absolute;inset:0;z-index:1;will-change:clip-path;clip-path:circle(100% at 50% 50%);pointer-events:none}
+html .orb-inner{position:absolute;inset:0;transform-origin:center;will-change:scale,transform}
+html .hero-art{object-fit:cover;width:100%;height:100%;animation:goodpatch-breathe 9s ease-in-out infinite alternate;max-width:none}
+html #heroMotionCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity 1s;pointer-events:none}
+html .hero-motion-ready #heroMotionCanvas{opacity:1}
+html .orb-shade{position:absolute;inset:0;background:radial-gradient(circle at var(--glow-x,50%) var(--glow-y,50%),#ffc4af3d 0%,#ff8f8b12 22%,transparent 43%),linear-gradient(0deg,#63071944,transparent 40%,#5009151c);mix-blend-mode:screen;pointer-events:none}
+html .hero-heading{translate:var(--title-x,0px) var(--title-y,0px);will-change:translate}
+html .opening-axis{position:absolute;top:8%;bottom:8%;left:50%;width:1px;background:#25272935;opacity:0}
+html .opening-stage>.hero,html .opening-stage>.discovery{position:absolute;inset:0;height:100%;min-height:0;background:transparent;isolation:auto;overflow:visible;z-index:2}
+html .hero:after{display:none}
+html .hero-heading{top:40%;left:0;right:0;bottom:auto;text-align:center;transform:translateY(-24%)}
+html .hero-heading .eyebrow{font-size:12px;color:#fff;margin-bottom:28px;letter-spacing:2px}
+html .hero h1{font:700 clamp(96px,12.8vw,215px)/.97 Arial,sans-serif;letter-spacing:-.065em;color:#fff;white-space:nowrap}
+html .headline-line{padding:0 20px}
+html .hero-bottom{position:absolute;bottom:52px;left:3.2vw;right:4vw;display:flex;align-items:flex-end;justify-content:space-between;color:white}
+html .hero-bottom>p{font-size:28px;font-weight:650;line-height:1.55;letter-spacing:.04em;margin:0}
+html .hero-bottom>span{font-size:12px;line-height:1.9;color:#ffeaec;text-align:right}
+html .hero-next{display:flex;gap:18px;align-items:center;font-size:13px}
+html .hero-next span{display:grid;place-items:center;width:42px;height:42px;border:1px solid #ffffff88;border-radius:50%;font-size:23px;transition:background .3s}
+html .hero-next:hover span{background:white;color:var(--red)}
+html .opening-stage>.discovery{opacity:0;pointer-events:none;display:flex;align-items:center;justify-content:space-between;padding:55px 3.2vw 15px;color:var(--ink)}
+html .discovery-side{width:36%;will-change:transform}
+html .discovery-right{text-align:right}
+html .pill-label{display:inline-block;border:1px solid var(--red);color:var(--red);border-radius:30px;padding:5px 13px;font:12px/1.5 Arial;margin-bottom:20px}
+html .discovery h2{font-size:clamp(44px,5.25vw,90px);line-height:1.04;letter-spacing:-.06em;margin:0 0 30px;font-weight:700}
+html .discovery h2 em{font-style:normal;color:var(--red)}
+html .discovery h3{font-size:clamp(23px,2.15vw,36px);line-height:1.5;font-weight:600;margin-bottom:15px;letter-spacing:-.025em}
+html .discovery-side>p:not(.pill-label){font-size:15px;color:#64676a;line-height:1.9;margin-bottom:28px}
+html .circle-link{display:inline-flex;align-items:center;gap:28px;font-size:14px}
+html .circle-link i{font:18px Arial;display:grid;place-items:center;width:33px;height:33px;background:var(--red);color:#fff;border-radius:50%;transition:transform .4s}
+html .circle-link:hover i{transform:rotate(45deg)}
+html .orb-caption{position:absolute;left:50%;top:calc(50% + 162px);transform:translateX(-50%);font:10px Arial;letter-spacing:1.3px;background:var(--paper);padding:12px 4px;white-space:nowrap}
+html .roaming{border-radius:0;background:#100b0d}
+html .roaming-copy{padding-top:15vh;padding-left:5vw}
+html .cargo-title{font-size:clamp(60px,7.4vw,120px);font-weight:700;line-height:1.15;letter-spacing:-.055em}
+html .roaming-aside{right:8%}
+html .roaming-aside strong{font-family:Arial,"PingFang SC",sans-serif;font-weight:500}
+html .editorial{padding:110px 4.5vw 110px}
+html .section-top{border-color:#25272930;margin-bottom:65px}
+html .section-heading{gap:6vw;align-items:flex-end;margin-bottom:60px}
+html .section-heading h2{font-size:clamp(40px,4.6vw,80px)}
+html .section-heading p{width:300px;flex-shrink:0;font-size:16px}
+html .section-heading>h3{font-size:28px;font-weight:600;letter-spacing:-.03em;margin:0}
+html .mega-title{font:700 clamp(95px,12vw,190px)/.91 Arial;letter-spacing:-.065em;color:var(--ink);margin:0 0 66px}
+html .mega-title span{display:block}
+html .daily{background:var(--paper);color:var(--ink)}
+html .daily .section-heading h2{font-size:32px;line-height:1.4;letter-spacing:-.035em}
+html .daily-layout{display:grid;grid-template-columns:25% 1fr;gap:5vw}
+html .daily .mood-tabs{flex-direction:column;align-items:flex-start;margin:0;gap:8px;position:sticky;top:120px;align-self:start}
+html .mood-tabs button{border:0;background:none;border-radius:0;padding:10px 0 10px 17px;color:#686b6e;position:relative;text-align:left}
+html .mood-tabs button:before{content:'';position:absolute;left:0;top:17px;width:4px;height:4px;background:currentColor;border-radius:50%;opacity:0}
+html .mood-tabs button:hover,html .mood-tabs button[aria-pressed=true]{color:var(--red);background:none}
+html .mood-tabs button[aria-pressed=true]:before{opacity:1}
+html .album-grid{grid-template-columns:repeat(2,1fr);gap:45px 28px;min-height:0}
+html .album-cover{border-radius:8px;background:#e2e3e6;aspect-ratio:1.12}
+html .album-cover img{object-fit:contain;padding:27px;transition:transform .85s var(--ease)}
+html .album-card:nth-child(4n+2) .album-cover{background:#e6d4cd}
+html .album-card:nth-child(4n+3) .album-cover{background:#d8e0d9}
+html .album-card:hover img{transform:scale(1.06) rotate(-2deg)}
+html .album-tag{top:14px;left:15px;background:#fff;color:#252729;border-radius:30px;font-size:11px;backdrop-filter:none}
+html .album-card h3{font-size:23px;font-weight:600;margin:19px 0 6px;letter-spacing:-.02em}
+html .album-card p{font-size:13px}
+html #filterStatus{margin:40px 0 0 30%}
+html .collection{background:var(--paper);color:var(--ink);padding:80px 4.5vw 140px;gap:6vw;grid-template-columns:.85fr 1.15fr}
+html .collection-intro{top:130px}
+html .collection-intro h2{font-size:clamp(40px,4.3vw,72px)}
+html .collection-intro nav a{border-bottom:1px solid #25272920;padding-bottom:18px;opacity:1}
+html .collection-intro nav a:hover{color:var(--red)}
+html .stack-card{border-radius:12px;color:#fff;box-shadow:0 16px 50px #25272914}
+html .stack-card h3{font-family:Arial,"PingFang SC",sans-serif;font-weight:600}
+html .artists{background:#e5e7ea}
+html .artist-gallery{grid-template-columns:1fr 1fr;gap:70px 30px;margin-top:60px}
+html .artist-card:nth-child(even){padding-top:0;transform:translateY(80px)}
+html .artist-gallery{padding-bottom:80px}
+html .artist-portrait{height:clamp(380px,42vw,680px);border-radius:8px}
+html .artist-portrait img{filter:grayscale(.35)}
+html .artist-portrait>span{writing-mode:horizontal-tb;left:25px;top:24px;font-size:12px;text-shadow:0 1px 6px #0007}
+html .artist-portrait:after{content:'VIEW ↗';width:90px;height:90px;display:grid;place-items:center;border-radius:50%;font-size:15px;right:30px;bottom:30px;background:var(--red);color:white;opacity:0;transform:translateY(20px);transition:opacity .4s,transform .4s}
+html .artist-card:hover .artist-portrait:after,html .artist-card:focus-visible .artist-portrait:after{opacity:1;transform:none}
+html .artist-info{padding-top:25px;display:flex}
+html .artist-info h3{font-size:29px;font-weight:600}
+html .artist-info span{font-size:14px}
+html .feature-copy h2{font-size:clamp(40px,4.3vw,72px)}
+html .vinyl{background:#e72b36;color:#fff}
+html .vinyl .section-top{border-color:#ffffff55}
+html .vinyl-copy h2{font-size:clamp(48px,5.8vw,96px)}
+html .vinyl-copy>p,html .record-caption{color:#ffe1e3}
+html .record-stage img{filter:drop-shadow(0 30px 30px #5b050c55)}
+html .album-story{background:var(--paper)}
+html .album-feature-image img{border-radius:6px;box-shadow:none}
+html .album-feature-copy h2{font-size:clamp(48px,5.5vw,90px)}
+html .live-copy{padding-left:4.5vw}
+html .live-copy h2{font-size:clamp(50px,6vw,98px)}
+html .community{background:var(--paper);color:var(--ink)}
+html .quote-card{background:#fff;border:0;border-radius:8px;padding:32px;min-height:370px}
+html .quote-card:hover{background:#fff;box-shadow:0 18px 50px #2527290a}
+html .quote-card blockquote{font-family:Arial,"PingFang SC",sans-serif;font-weight:550;font-size:clamp(21px,2vw,32px);letter-spacing:-.03em}
+html .connections{background:#e5e7ea;color:var(--ink)}
+html .sound-map svg{color:#df5360}
+html .route-description{border-color:#df5360}
+html .map-node{box-shadow:0 0 0 7px #fff6}
+html .map-node img{border-color:#fff}
+html .moments{background:var(--paper)}
+html .moment-time{background:#e2e4e7}
+html .download-section{background:#e72b36;padding:100px 4.5vw 0}
+html .download-section .section-top{border-color:#fff4}
+html .download-main{padding:25px 0 90px;text-align:left;position:relative}
+html .download-main>img{position:absolute;right:7vw;top:5vh;width:180px;height:180px;border-radius:42px;transform:rotate(-12deg);box-shadow:15px 25px 60px #760b2133}
+html .download-main h2{font:700 clamp(80px,10vw,170px)/.96 Arial;letter-spacing:-.065em;max-width:75%;margin-bottom:40px}
+html .download-main h2 .download-cn{display:block;font:600 28px/1.6 Arial,"PingFang SC",sans-serif;letter-spacing:0;margin-top:35px}
+html .download-main p,html .platforms{color:#ffe4e6}
+html .platforms{justify-content:flex-start}
+html .footer-word{font-size:12.4vw;color:#ff6a7280}
+html footer{color:#ffe4e6;border-color:#fff4;font-size:12px}
+html .split-cta>span,html .split-cta i{background:#fff}
+html .feature-controls button:hover{background:var(--red);border-color:var(--red)}
+html .chapter-menu{background:var(--paper);color:var(--ink)}
+html .chapter-menu #menuLinks a{border-color:#25272922}
+html .chapter-menu #menuLinks a:hover{color:var(--red)}
+html .chapter-menu>p{color:#74777a}
+html .chapter-menu #menuLinks a span{color:var(--red);opacity:1}
+html dialog{border-radius:12px}
+html .js-motion .reveal{transform:translateY(45px)}
+html .js-motion .reveal.visible{transform:none}
+@keyframes goodpatch-breathe{0%{transform:scale(1.055) translate(-1.1%,.3%)}50%{transform:scale(1.105) translate(.45%,-.85%)}100%{transform:scale(1.07) translate(1.1%,.55%)}}
+@media(prefers-reduced-motion:reduce){html .hero-art{animation:none!important}html #heroMotionCanvas{display:none!important}html .discovery-side{transform:none!important}}

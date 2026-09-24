@@ -1,0 +1,242 @@
+/* Desktop motion layer: all content remains legible when motion is paused. */
+html body.js-motion.experience-ready .mega-title.reveal {
+  opacity: 1;
+  transform: none;
+}
+html body.js-motion.experience-ready .mega-title.reveal > span {
+  clip-path: inset(0 0 110% 0);
+  transform: translateY(.36em);
+  opacity: .28;
+  transition: clip-path 1.15s cubic-bezier(.16,1,.3,1), transform 1.15s cubic-bezier(.16,1,.3,1), opacity .85s ease;
+}
+html body.js-motion.experience-ready .mega-title.reveal.visible > span {
+  clip-path: inset(0 0 0 0);
+  transform: translateY(0);
+  opacity: 1;
+}
+html body.js-motion.experience-ready .mega-title.reveal > span:nth-child(2) { transition-delay: .13s; }
+
+html body.js-motion.experience-ready .motion-enter {
+  opacity: 0;
+  translate: 0 54px;
+  transition: opacity .9s ease, translate 1.05s cubic-bezier(.16,1,.3,1);
+  transition-delay: var(--enter-delay,0ms);
+}
+html body.js-motion.experience-ready .motion-enter.is-shown {
+  opacity: 1;
+  translate: 0 0;
+}
+html body.js-motion.experience-ready .artist-card.motion-enter .artist-portrait,
+html body.js-motion.experience-ready .feature-photo.motion-enter,
+html body.js-motion.experience-ready .album-feature-image.motion-enter {
+  clip-path: inset(0 0 100% 0 round 8px);
+  transition: clip-path 1.3s cubic-bezier(.16,1,.3,1);
+  transition-delay: var(--enter-delay,0ms);
+}
+html body.js-motion.experience-ready .artist-card.motion-enter.is-shown .artist-portrait,
+html body.js-motion.experience-ready .feature-photo.motion-enter.is-shown,
+html body.js-motion.experience-ready .album-feature-image.motion-enter.is-shown {
+  clip-path: inset(0 0 0 0 round 8px);
+}
+html body.js-motion.experience-ready .artist-card.motion-enter .artist-info {
+  opacity: 0;
+  translate: 0 18px;
+  transition: opacity .8s ease, translate .8s cubic-bezier(.16,1,.3,1);
+  transition-delay: calc(var(--enter-delay,0ms) + 170ms);
+}
+html body.js-motion.experience-ready .artist-card.motion-enter.is-shown .artist-info {
+  opacity: 1;
+  translate: 0 0;
+}
+
+html .album-cover::after,
+html .artist-portrait::after {
+  position: absolute;
+  left: var(--lens-x,50%);
+  top: var(--lens-y,50%);
+  right: auto;
+  bottom: auto;
+  width: 116px;
+  height: 116px;
+  padding: 0;
+  border: 1px solid #ffffff9c;
+  border-radius: 50%;
+  color: white;
+  background: var(--red);
+  display: grid;
+  place-items: center;
+  font: 600 12px/1 Arial,"PingFang SC",sans-serif;
+  letter-spacing: .07em;
+  box-shadow: 0 0 0 8px #ffffff45;
+  opacity: 0;
+  transform: translate(-50%,-50%) scale(.56);
+  transition: opacity .22s ease, transform .42s cubic-bezier(.16,1,.3,1);
+  pointer-events: none;
+  z-index: 3;
+}
+html .album-cover::after { content: "LISTEN ↗"; }
+html .artist-portrait::after { content: "VIEW ↗"; }
+html .album-card:hover .album-cover::after,
+html .album-card:focus-within .album-cover::after,
+html .artist-card:hover .artist-portrait::after,
+html .artist-card:focus-visible .artist-portrait::after {
+  opacity: 1;
+  transform: translate(-50%,-50%) scale(1);
+}
+html .album-cover img,
+html .artist-portrait img {
+  translate: var(--image-x,0px) var(--image-y,0px);
+  transition: transform .85s cubic-bezier(.16,1,.3,1), translate .48s cubic-bezier(.16,1,.3,1), filter .65s, scale .8s cubic-bezier(.16,1,.3,1);
+}
+html .album-card:active .album-cover img,
+html .artist-card:active .artist-portrait img { scale: .96; }
+
+html .stack-card img {
+  translate: var(--stack-x,0px) var(--stack-y,0px);
+  scale: 1.065;
+  transition: translate .6s cubic-bezier(.16,1,.3,1), scale 1s cubic-bezier(.16,1,.3,1);
+}
+html .stack-card:hover img { scale: 1.105; }
+html .stack-card > div { transition: translate .55s cubic-bezier(.16,1,.3,1); }
+html .stack-card:hover > div { translate: 0 -9px; }
+html .quote-card { transition: background .5s ease, box-shadow .5s ease, transform .5s cubic-bezier(.16,1,.3,1); }
+html .quote-card:hover { background: #ffe0e0; box-shadow: 0 24px 50px #25272917; }
+html .quote-card:active { transform: translateY(-2px); }
+
+html .record-stage {
+  transform: perspective(1200px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));
+  transition: transform .7s cubic-bezier(.16,1,.3,1);
+  transform-style: preserve-3d;
+}
+html .record-caption { transform: translateZ(32px); }
+
+html .live-section {
+  border-radius: 50% 50% 0 0 / 95px 95px 0 0;
+  overflow: hidden;
+}
+html .live-massive,
+html .footer-word,
+html .oversize-word {
+  translate: var(--drift-x,0px) 0;
+  will-change: translate;
+  pointer-events: none;
+}
+
+html .moment-time { overflow: hidden; isolation: isolate; }
+html .moment-art {
+  position: absolute;
+  width: 76%;
+  height: 76%;
+  left: 12%;
+  top: 12%;
+  object-fit: cover;
+  border-radius: 50%;
+  opacity: 0;
+  transform: rotate(-13deg) scale(.74);
+  filter: saturate(.8);
+  transition: opacity .65s ease, transform .9s cubic-bezier(.16,1,.3,1);
+  pointer-events: none;
+  z-index: 0;
+}
+html .moment-art.is-current { opacity: .33; transform: rotate(0) scale(1); }
+html .moment-time > span, html .moment-time > p { position: relative; z-index: 2; text-shadow: 0 1px 14px #ffffffa6; }
+html .moment-ring { z-index: 1; }
+html .moment-options button {
+  border-radius: 8px;
+  padding-left: 14px;
+  padding-right: 14px;
+  transition: color .35s ease, padding .4s ease, background .35s ease;
+}
+html .moment-options button:hover,
+html .moment-options button:focus-visible { background: #e72b3613; }
+html .moment-options button[aria-pressed="true"] { padding-left: 24px; }
+html .moment-options button i { transition: transform .35s cubic-bezier(.16,1,.3,1); }
+html .moment-options button:hover i,
+html .moment-options button:focus-visible i { transform: translate(4px,-4px) rotate(45deg); }
+
+html .chapter .section-top { position: relative; }
+html .chapter .section-top::before {
+  content: "";
+  position: absolute;
+  height: 2px;
+  width: min(160px,18vw);
+  left: 0;
+  top: -1px;
+  background: var(--red);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 1.1s cubic-bezier(.16,1,.3,1);
+}
+html .chapter.is-active .section-top::before { transform: scaleX(1); }
+html .vinyl .section-top::before,
+html .download-section .section-top::before { background: white; }
+
+html .split-cta > span,
+html .split-cta > i { transition: background .35s ease, color .35s ease, transform .45s cubic-bezier(.16,1,.3,1); }
+html .split-cta:hover > span,
+html .split-cta:hover > i { background: var(--red); color: white; }
+html .vinyl .split-cta:hover > span,
+html .vinyl .split-cta:hover > i,
+html .download-section .split-cta:hover > span,
+html .download-section .split-cta:hover > i { background: #252729; }
+
+html body.header-floating > .site-header {
+  top: 14px;
+  left: 3.2vw;
+  right: 3.2vw;
+  height: 72px;
+  padding: 9px 20px 9px 22px;
+  border: 1px solid #25272913;
+  border-radius: 999px;
+  background: #f0f1f3ee;
+  backdrop-filter: blur(18px);
+  color: #252729;
+  box-shadow: 0 12px 35px #15151524;
+  transform: translateY(0);
+  transition: top .5s cubic-bezier(.16,1,.3,1), left .5s cubic-bezier(.16,1,.3,1), right .5s cubic-bezier(.16,1,.3,1), height .5s cubic-bezier(.16,1,.3,1), border-radius .5s cubic-bezier(.16,1,.3,1), background .35s, color .35s, transform .5s;
+}
+html body.header-floating .brand-name { filter: brightness(0); }
+html body.header-floating .menu-button { background: #252729; color: white; }
+
+html body.motion-paused .mega-title.reveal > span,
+html body.motion-paused .motion-enter,
+html body.motion-paused .motion-enter .artist-portrait,
+html body.motion-paused .motion-enter .artist-info,
+html body.motion-paused .motion-enter.feature-photo,
+html body.motion-paused .motion-enter.album-feature-image {
+  opacity: 1 !important;
+  clip-path: none !important;
+  transform: none !important;
+  translate: 0 0 !important;
+  transition: none !important;
+}
+html body.motion-paused .live-massive,
+html body.motion-paused .footer-word,
+html body.motion-paused .oversize-word { translate: 0 0 !important; }
+html body.motion-paused .album-cover img,
+html body.motion-paused .artist-portrait img,
+html body.motion-paused .stack-card img { translate: 0 0 !important; }
+html body.motion-paused .record-stage { transform: none !important; }
+html body.motion-paused .quote-card:hover { transform: none !important; }
+html body.motion-paused .album-cover::after,
+html body.motion-paused .artist-portrait::after,
+html body.motion-paused .moment-art,
+html body.motion-paused .moment-options button,
+html body.motion-paused .quote-card,
+html body.motion-paused .stack-card img { transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  html .mega-title.reveal > span,
+  html .motion-enter,
+  html .motion-enter .artist-portrait,
+  html .motion-enter .artist-info,
+  html .motion-enter.feature-photo,
+  html .motion-enter.album-feature-image {
+    opacity: 1 !important;
+    clip-path: none !important;
+    transform: none !important;
+    translate: 0 0 !important;
+  }
+  html .live-massive,
+  html .footer-word,
+  html .oversize-word { translate: 0 0 !important; }
+}

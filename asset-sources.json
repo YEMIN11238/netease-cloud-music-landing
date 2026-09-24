@@ -1,0 +1,26 @@
+{
+  "purpose": "Public-viewing NetEase Cloud Music concept page asset provenance",
+  "rights": "The maintainer reports permission for display in this concept page. No general reuse license is granted to repository viewers. NetEase logos are brand marks; musician photographs, album artwork and the press photo remain subject to their respective rights holders. Source links establish provenance, not a sublicense.",
+  "generated": [{"file":"music-hero-red.png","mode":"built-in imagegen","dimensions":"1672x941","description":"Original crimson sculptural music world with central peach-coral vinyl ring. No reference website artwork copied.","prompt_document":"../GOODPATCH-REVISION.md"}],
+  "logo": [
+    {"file":"netease-logo.jpg","name":"网易云音乐 official app icon","url":"https://p3.music.126.net/9z9CeujRSPOPm7Rq2DFw_g==/6674035581283071.jpg","source":"https://music.163.com/","verification":"Declared as Organization.logo in official homepage JSON-LD; visually inspected."},
+    {"file":"netease-topbar.png","name":"网易云音乐 official header logo sprite","url":"https://s2.music.126.net/style/web2/img/frame/topbar.png","source":"https://s2.music.126.net/web/s/core_33f59459426c3e4f2e131d3c631b11c5.css","usage":"Original official .m-top .logo uses width 176px, height 69px, background-position 0 0. Actual visible mark occupies about x0–157/y19–52. Display as CSS sprite, do not show whole sprite."}
+  ],
+  "artists": [
+    {"file":"chen-li.jpg","name":"陈粒","url":"https://p1.music.126.net/3WhzK6ozFXUsNutDU566ZA==/6641050233030995.jpg","source":"https://music.163.com/artist?id=1007170","metadata":"https://music.163.com/api/artist/1007170","notes":"Blue/pink expressive close-up with hands over eyes; 640x520."},
+    {"file":"mao-buyi.jpg","name":"毛不易","url":"https://p2.music.126.net/BGXHSF_DfcwTqdmMb6C_-g==/109951169875197682.jpg","source":"https://music.163.com/artist?id=12138269","metadata":"https://music.163.com/api/artist/12138269","notes":"Gray wall editorial portrait; 1500x1218."},
+    {"file":"landlords-cat.jpg","name":"房东的猫","url":"https://p1.music.126.net/N_H3a9Wa2qEgYspPoM5OsQ==/109951173415048091.jpg","source":"https://music.163.com/artist?id=1050282","metadata":"https://music.163.com/api/artist/1050282","notes":"Duo beneath tree, guitar, sunlight; 1024x1024. Official img1v1Url."},
+    {"file":"chen-hongyu.jpg","name":"陈鸿宇","url":"https://p1.music.126.net/HQXDPPEJyy-wEItLuho3ww==/109951164488639978.jpg","source":"https://music.163.com/artist?id=1058228","metadata":"https://music.163.com/api/artist/1058228","notes":"Black and white seated portrait; 1434x1164."}
+  ],
+  "albums": [
+    {"file":"album-xiaomeng.jpg","name":"小梦大半","artist":"陈粒","url":"https://p1.music.126.net/HQxTggMCB7AHUXN-ZFEtmA==/1371091013186741.jpg","source":"https://music.163.com/album?id=34780579"},
+    {"file":"album-xiaowang.jpg","name":"小王","artist":"毛不易","url":"https://p2.music.126.net/XPPeIZu7wgcGXZ0666mfFg==/109951164640697307.jpg","source":"https://music.163.com/album?id=83823905"},
+    {"file":"album-soft.jpg","name":"柔软","artist":"房东的猫","url":"https://p2.music.126.net/oKH5VQ-uXbV94wSUuWVJ9w==/109951163204748231.jpg","source":"https://music.163.com/album?id=37989114","notes":"Recommended over self-titled cover: full photographic image of duo in plant-filled room."},
+    {"file":"album-poetry-radio.jpg","name":"浓烟下的诗歌电台","artist":"陈鸿宇","url":"https://p2.music.126.net/ryk8Gu64rOhlYn0pc2Q8Ww==/109951168090271827.jpg","source":"https://music.163.com/album?id=3116882","notes":"Minimal cream textured artwork with small bird at bottom."},
+    {"file":"album-landlords-cat.jpg","name":"房东的猫","artist":"房东的猫","url":"https://p2.music.126.net/XSCmc9ZbWcpeizDya2g6JQ==/18598239185572641.jpg","source":"https://music.163.com/album?id=35139573","notes":"Alternative: mostly white with group wordmark."}
+  ],
+  "live": [
+    {"file":"festival-live.jpg","name":"2023 热爱全开音乐节，青岛","url":"https://imagepphcloud.thepaper.cn/pph/image/261/767/7.jpg","source":"https://www.thepaper.cn/newsDetail_forward_23894137","notes":"Verified night concert photo with NetEase and Pepsi branding; 866x577."},
+    {"file":null,"name":"2017 NetEase Cloud Music Original Artists Ceremony (held January 17, 2018)","url":"https://ir.netease.com/system/files-encrypted/nasdaq_kms/inline-images/NetEase_Cloud_Music.jpg","source":"https://ir.netease.com/news-releases/news-release-details/netease-cloud-music-holds-chinas-first-indie-music-artists","notes":"Official press photo located but direct download returns HTTP 403; not saved."}
+  ]
+}
