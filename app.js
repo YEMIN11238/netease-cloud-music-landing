@@ -4,7 +4,7 @@ const $$ = (selector, root=document) => [...root.querySelectorAll(selector)];
 const page=$('#page'), chapters=$$('.chapter'), reduce=matchMedia('(prefers-reduced-motion: reduce)');
 if('scrollRestoration' in history)history.scrollRestoration='manual';
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
-let paused=reduce.matches, active=0, scrollAnimation=null, wheelLock=0;
+let paused=reduce.matches, active=0, scrollAnimation=null;
 const motionOK=()=>!paused&&!reduce.matches;
 const animate=(target,options)=>{if(window.anime&&motionOK())return anime.animate(target,options);return null;};
 if(motionOK())document.body.classList.add('js-motion');
@@ -46,52 +46,28 @@ chapters.forEach((section,index)=>{
 $('#menuButton').addEventListener('click',()=>{openDialog($('#chapterMenu'));$('#menuButton').setAttribute('aria-expanded','true');animate('#menuLinks a',{y:[25,0],opacity:[0,1],delay:window.anime?anime.stagger(35):0,duration:500,ease:'outExpo'});});
 $('#chapterMenu').addEventListener('close',()=>$('#menuButton').setAttribute('aria-expanded','false'));
 function chapterTop(target){return target.dataset.opening!==undefined?Number(target.dataset.opening)*page.clientHeight:target.getBoundingClientRect().top-page.getBoundingClientRect().top+page.scrollTop;}
-function goTo(id){const target=document.getElementById(id);if(!target)return;scrollAnimation?.cancel();const destination=chapterTop(target)-(target.classList.contains('stack-card')?110:0);wheelLock=performance.now()+1150;const state={top:page.scrollTop};if(motionOK()&&window.anime){page.style.scrollBehavior='auto';scrollAnimation=anime.animate(state,{top:destination,duration:1000,ease:'inOutQuart',onUpdate:()=>{page.scrollTop=state.top;},onComplete:()=>{scrollAnimation=null;page.style.scrollBehavior='';}});}else page.scrollTo({top:destination,behavior:'instant'});}
+function cancelScrollAnimation(){if(scrollAnimation){scrollAnimation.cancel();scrollAnimation=null;page.style.scrollBehavior='';}}
+function goTo(id){const target=document.getElementById(id);if(!target)return;cancelScrollAnimation();const destination=chapterTop(target)-(target.classList.contains('stack-card')?110:0);const state={top:page.scrollTop};if(motionOK()&&window.anime){page.style.scrollBehavior='auto';scrollAnimation=anime.animate(state,{top:destination,duration:1000,ease:'inOutQuart',onUpdate:()=>{page.scrollTop=state.top;},onComplete:()=>{scrollAnimation=null;page.style.scrollBehavior='';}});}else page.scrollTo({top:destination,behavior:'instant'});}
 document.addEventListener('click',event=>{const anchor=event.target.closest('a[href^="#"]');if(!anchor)return;const id=anchor.getAttribute('href').slice(1);if(!document.getElementById(id))return;event.preventDefault();if($('#chapterMenu').open)$('#chapterMenu').close();goTo(id);history.replaceState(null,'',`#${id}`);});
 window.addEventListener('hashchange',()=>{const id=decodeURIComponent(location.hash.slice(1));if(document.getElementById(id))goTo(id);});
 $$('[data-go]').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.go)));
 
-// The opening five scenes advance one beat at a time; long editorial chapters
-// resume normal scrolling. Touch follows the same scene stops without trapping
-// readers in the longer card and article sections.
+// The opening remains native, continuous and reversible. A tiny proximity
+// settle helps precise chapter landings without intercepting wheel deltas.
 const introSceneIds=['hero','discover','roaming','pulse','echo','daily'];
-function introStops(){return introSceneIds.map(id=>({id,top:chapterTop(document.getElementById(id))}));}
-function nextIntroScene(direction){
- const stops=introStops(),y=page.scrollTop,end=stops.at(-1).top;
- if(direction>0&&y>=end-18)return null;
- if(direction<0&&y>end+25)return null;
- return direction>0
-  ?stops.find(stop=>stop.top>y+18)||null
-  :stops.findLast(stop=>stop.top<y-18)||null;
-}
-page.addEventListener('wheel',event=>{
- if(!motionOK()||Math.abs(event.deltaY)<3||event.ctrlKey)return;
- const target=nextIntroScene(event.deltaY);
- if(!target)return;
- event.preventDefault();
- if(performance.now()<wheelLock)return;
- goTo(target.id);
-},{passive:false});
-let touchStart=null;
-page.addEventListener('touchstart',event=>{
- if(event.touches.length!==1)return;
- touchStart={x:event.touches[0].clientX,y:event.touches[0].clientY,top:page.scrollTop};
+let snapTimer;
+page.addEventListener('wheel',()=>{
+ cancelScrollAnimation();
+ clearTimeout(snapTimer);
+ snapTimer=setTimeout(()=>{
+  if(!motionOK())return;
+  const y=page.scrollTop;
+  const stops=introSceneIds.map(id=>chapterTop(document.getElementById(id)));
+  const near=stops.find(top=>Math.abs(y-top)<45&&Math.abs(y-top)>2);
+  if(near!==undefined)page.scrollTo({top:near,behavior:'smooth'});
+ },220);
 },{passive:true});
-page.addEventListener('touchmove',event=>{
- if(!touchStart||!motionOK()||event.touches.length!==1)return;
- const dx=event.touches[0].clientX-touchStart.x,dy=touchStart.y-event.touches[0].clientY;
- if(Math.abs(dy)>8&&Math.abs(dy)>Math.abs(dx)*1.1&&nextIntroScene(dy))event.preventDefault();
-},{passive:false});
-page.addEventListener('touchend',event=>{
- if(!touchStart)return;
- const dy=touchStart.y-event.changedTouches[0].clientY,dx=touchStart.x-event.changedTouches[0].clientX;
- if(motionOK()&&Math.abs(dy)>42&&Math.abs(dy)>Math.abs(dx)*1.1&&performance.now()>wheelLock){
-  const target=nextIntroScene(dy);
-  if(target)goTo(target.id);
- }
- touchStart=null;
-},{passive:true});
-page.addEventListener('touchcancel',()=>{touchStart=null;},{passive:true});
+page.addEventListener('touchstart',()=>{cancelScrollAnimation();clearTimeout(snapTimer);},{passive:true});
 
 const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');revealObserver.unobserve(entry.target);}}),{root:page,threshold:.12});
 $$('.reveal').forEach(el=>revealObserver.observe(el));
@@ -100,12 +76,33 @@ function animateChapter(section){if(entered.has(section.id))return;entered.add(s
  if(section.id==='roaming'){animate('.cargo-title>span',{x:(_,i)=>[i%2?900:-900,0],opacity:[0,1],duration:1100,delay:window.anime?anime.stagger(130):0,ease:'outExpo'});animate('.word-reveal',{y:['100%',0],rotateX:[45,0],opacity:[0,1],duration:800,delay:window.anime?anime.stagger(80,{start:350}):0,ease:'outExpo'});scramble();}
  if(section.id==='connections')animate('.map-node',{scale:[.2,1],opacity:[0,1],delay:window.anime?anime.stagger(120):0,duration:1300,ease:'outElastic(1, .6)'});
 }
-let framePending=false;const cards=$$('.stack-card'),parallax=$$('[data-parallax]');
+let framePending=false;const cards=$$('.stack-card'),parallax=$$('[data-parallax]'),heroArtwork=$('.hero-art'),openingStage=$('.opening-stage');
+function recordFocalPoint(width,height){
+ // Measured center of the record in the 1672 × 941 hero artwork. Convert it
+ // through object-fit: cover so narrow viewports keep the same focal point.
+ const imageWidth=heroArtwork.naturalWidth||1672,imageHeight=heroArtwork.naturalHeight||941;
+ const cover=Math.max(width/imageWidth,height/imageHeight);
+ return {
+  x:(width-imageWidth*cover)/2+imageWidth*(830/1672)*cover,
+  y:(height-imageHeight*cover)/2+imageHeight*(413/941)*cover
+ };
+}
 function updateScroll(){framePending=false;const y=page.scrollTop,h=page.clientHeight;const current=chapters.findLastIndex(s=>chapterTop(s)<=y+h*.42);active=Math.max(0,current);$('#currentChapter').textContent=String(active+1).padStart(2,'0');$$('#railLinks a').forEach((a,i)=>{if(i===active)a.setAttribute('aria-current','step');else a.removeAttribute('aria-current');});chapters.forEach((s,i)=>s.classList.toggle('is-active',i===active));animateChapter(chapters[active]);$('#pageProgress').style.width=`${y/Math.max(1,page.scrollHeight-h)*100}%`;
- const p=motionOK()?clamp(y/(h*1.15)):(y>h*.5?1:0),ease=p*p*(3-2*p),radius=Math.hypot(page.clientWidth,h)/2;
- const orbRadius=radius+(Math.min(page.clientWidth*.098,145)-radius)*ease;
- $('.music-orb').style.clipPath=`circle(${orbRadius}px at 50% 50%)`;
- $('.orb-inner').style.scale=String(Math.max(.68,Math.min(1,orbRadius*2/h+.06)));
+ const width=page.clientWidth,p=motionOK()?clamp(y/(h*1.15)):(y>h*.5?1:0),ease=p*p*(3-2*p);
+ const focal=recordFocalPoint(width,h);
+ const startRadius=Math.max(Math.hypot(focal.x,focal.y),Math.hypot(width-focal.x,focal.y),Math.hypot(focal.x,h-focal.y),Math.hypot(width-focal.x,h-focal.y))+4;
+ const endRadius=width<=800?Math.min(width*.17,82):Math.min(width*.098,145);
+ const orbRadius=startRadius+(endRadius-startRadius)*ease;
+ const desiredScale=Math.max(.68,Math.min(1,orbRadius*2/h+.06));
+ // Do not let the scaled artwork's rectangular edges enter the circular mask
+ // on portrait screens while the circle is still wider than the viewport.
+ const innerScale=Math.min(1,Math.max(desiredScale,(orbRadius*2+4)/Math.min(width,h)));
+ const centerX=width/2+(focal.x-width/2)*innerScale,centerY=h/2+(focal.y-h/2)*innerScale;
+ $('.music-orb').style.clipPath=`circle(${orbRadius}px at ${centerX.toFixed(2)}px ${centerY.toFixed(2)}px)`;
+ $('.orb-inner').style.scale=String(innerScale);
+ openingStage.style.setProperty('--record-cx',`${centerX.toFixed(2)}px`);
+ openingStage.style.setProperty('--record-cy',`${centerY.toFixed(2)}px`);
+ openingStage.style.setProperty('--record-radius',`${orbRadius.toFixed(2)}px`);
  $('.hero').style.opacity=String(1-clamp(p*3));$('.hero').style.pointerEvents=p>.4?'none':'';
  const reveal=clamp((p-.73)/.27);$('.discovery').style.opacity=String(reveal);$('.discovery').style.pointerEvents=reveal>.8?'auto':'none';
  $('.hero').inert=p>.4;$('.discovery').inert=reveal<.8;
@@ -119,6 +116,7 @@ function updateScroll(){framePending=false;const y=page.scrollTop,h=page.clientH
  }
 }
 page.addEventListener('scroll',()=>{if(!framePending){framePending=true;requestAnimationFrame(updateScroll);}},{passive:true});window.addEventListener('resize',updateScroll);
+heroArtwork.addEventListener('load',updateScroll);
 
 let albumIndex=0;
 function changeAlbum(delta){albumIndex=(albumIndex+delta+albums.length)%albums.length;const a=albums[albumIndex];$('#featureCover').src=`assets/${a.file}`;$('#featureCover').alt=`${a.artist}《${a.title}》专辑封面`;$('#featureArtist').textContent=a.artist;$('#featureTitle').textContent=a.title;$('#featureDescription').textContent=a.description;$('#featureLink').href=`https://music.163.com/#/album?id=${a.id}`;$('#albumCounter').textContent=`0${albumIndex+1} / 04`;animate('#featureCover',{x:[delta*35,0],rotate:[delta*3,0],opacity:[.2,1],duration:700,ease:'outExpo'});animate('.album-feature-copy',{y:[15,0],opacity:[.4,1],duration:600,ease:'outExpo'});}

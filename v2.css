@@ -1,4 +1,9 @@
 /* The second edition: three new scenes and a real small-screen layout. */
+/* Keep the record itself anchored while light and the pointer remain alive. */
+html .hero-art{object-position:center center;animation:none}
+html .orb-shade{animation:record-light 7s ease-in-out infinite alternate}
+html .orb-caption{left:var(--record-cx,50%);top:calc(var(--record-cy,50%) + var(--record-radius,145px) + 8px)}
+@keyframes record-light{from{opacity:.82}to{opacity:1}}
 html .scene-top{position:absolute;top:108px;left:4.5vw;right:4.5vw;z-index:5;display:flex;justify-content:space-between;gap:24px;border-top:1px solid currentColor;padding-top:15px;font:12px/1.5 ui-monospace,monospace;letter-spacing:1px;text-transform:uppercase}
 html .scene-next{position:absolute;right:4.5vw;bottom:33px;z-index:6;display:flex;gap:14px;align-items:center;font-size:13px}
 html .scene-next span{display:grid;place-items:center;width:42px;height:42px;border:1px solid currentColor;border-radius:50%;font-size:21px;transition:transform .35s,background .35s}

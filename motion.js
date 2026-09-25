@@ -49,18 +49,19 @@
       uniform vec2 u_cover;
       uniform float u_strength;
       uniform float u_time;
+      uniform float u_motion;
       void main() {
         vec2 uv = v_uv;
         vec2 delta = uv - u_mouse;
         float radius = length(delta);
-        float touch = exp(-dot(delta, delta) * 17.0) * u_strength;
+        float touch = exp(-dot(delta, delta) * 17.0) * u_strength * u_motion;
         vec2 wave = vec2(
           sin(uv.y * 10.0 + uv.x * 4.0 + u_time * .55) * .0042
             + sin(uv.y * 22.0 - u_time * .84) * .0014,
           sin(uv.x * 11.0 - uv.y * 3.0 - u_time * .49) * .0035
             + cos(uv.x * 19.0 + u_time * .67) * .0012
         );
-        wave += normalize(delta + vec2(.001)) * touch * (.014 + .009 * sin(radius * 19.0 - u_time * 2.3));
+        wave = wave * u_motion + normalize(delta + vec2(.001)) * touch * (.014 + .009 * sin(radius * 19.0 - u_time * 2.3));
         vec2 textureUV = (uv - .5) * u_cover + .5 + wave;
         vec3 color = texture2D(u_image, clamp(textureUV, .001, .999)).rgb;
         float travelingLight = sin((uv.x + uv.y * .42) * 7.0 - u_time * .48) * .5 + .5;
@@ -98,7 +99,8 @@
       cover: gl.getUniformLocation(program, 'u_cover'),
       mouse: gl.getUniformLocation(program, 'u_mouse'),
       strength: gl.getUniformLocation(program, 'u_strength'),
-      time: gl.getUniformLocation(program, 'u_time')
+      time: gl.getUniformLocation(program, 'u_time'),
+      motion: gl.getUniformLocation(program, 'u_motion')
     };
     stage.classList.add('hero-motion-ready');
     resize();
@@ -152,9 +154,10 @@
     smoothed.strength += (pointer.strength - smoothed.strength) * .07;
     const driftX = Math.sin(elapsed * .31) * .012;
     const driftY = Math.cos(elapsed * .25) * .01;
+    const openingMotion = Math.max(0, 1 - page.scrollTop / (page.clientHeight * .52));
     const x = smoothed.x - .5;
     const y = .5 - smoothed.y;
-    orb.style.transform = `translate3d(${(x * -17 + driftX * 55).toFixed(2)}px, ${(y * -12 + driftY * 55).toFixed(2)}px, 0)`;
+    orb.style.transform = `translate3d(${((x * -17 + driftX * 55) * openingMotion).toFixed(2)}px, ${((y * -12 + driftY * 55) * openingMotion).toFixed(2)}px, 0)`;
     heading.style.setProperty('--title-x', `${(x * 14).toFixed(2)}px`);
     heading.style.setProperty('--title-y', `${(y * 9).toFixed(2)}px`);
     shade.style.setProperty('--glow-x', `${(50 + x * 18 + driftX * 200).toFixed(2)}%`);
@@ -163,6 +166,7 @@
     gl.uniform2f(renderer.mouse, smoothed.x, smoothed.y);
     gl.uniform1f(renderer.strength, smoothed.strength);
     gl.uniform1f(renderer.time, elapsed);
+    gl.uniform1f(renderer.motion, openingMotion);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
   requestAnimationFrame(draw);
