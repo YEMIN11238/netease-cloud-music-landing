@@ -2,6 +2,7 @@
 const $ = (selector, root=document) => root.querySelector(selector);
 const $$ = (selector, root=document) => [...root.querySelectorAll(selector)];
 const page=$('#page'), chapters=$$('.chapter'), reduce=matchMedia('(prefers-reduced-motion: reduce)');
+if('scrollRestoration' in history)history.scrollRestoration='manual';
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 let paused=reduce.matches, active=0, scrollAnimation=null, wheelLock=0;
 const motionOK=()=>!paused&&!reduce.matches;
@@ -47,12 +48,50 @@ $('#chapterMenu').addEventListener('close',()=>$('#menuButton').setAttribute('ar
 function chapterTop(target){return target.dataset.opening!==undefined?Number(target.dataset.opening)*page.clientHeight:target.getBoundingClientRect().top-page.getBoundingClientRect().top+page.scrollTop;}
 function goTo(id){const target=document.getElementById(id);if(!target)return;scrollAnimation?.cancel();const destination=chapterTop(target)-(target.classList.contains('stack-card')?110:0);wheelLock=performance.now()+1150;const state={top:page.scrollTop};if(motionOK()&&window.anime){page.style.scrollBehavior='auto';scrollAnimation=anime.animate(state,{top:destination,duration:1000,ease:'inOutQuart',onUpdate:()=>{page.scrollTop=state.top;},onComplete:()=>{scrollAnimation=null;page.style.scrollBehavior='';}});}else page.scrollTo({top:destination,behavior:'instant'});}
 document.addEventListener('click',event=>{const anchor=event.target.closest('a[href^="#"]');if(!anchor)return;const id=anchor.getAttribute('href').slice(1);if(!document.getElementById(id))return;event.preventDefault();if($('#chapterMenu').open)$('#chapterMenu').close();goTo(id);history.replaceState(null,'',`#${id}`);});
+window.addEventListener('hashchange',()=>{const id=decodeURIComponent(location.hash.slice(1));if(document.getElementById(id))goTo(id);});
 $$('[data-go]').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.go)));
 
-// Continuous wheel travel preserves the full-bleed-to-circle scroll choreography.
-// Only settle when already close to a scene endpoint, never skip a partial morph.
-let snapTimer;
-page.addEventListener('wheel',()=>{if(scrollAnimation){scrollAnimation.cancel();scrollAnimation=null;}clearTimeout(snapTimer);snapTimer=setTimeout(()=>{if(!motionOK())return;const stops=[0,1.35*page.clientHeight,chapterTop($('#roaming')),chapterTop($('#daily'))];const near=stops.find(top=>Math.abs(page.scrollTop-top)<45&&Math.abs(page.scrollTop-top)>2);if(near!==undefined)page.scrollTo({top:near,behavior:'smooth'});},220);},{passive:true});
+// The opening five scenes advance one beat at a time; long editorial chapters
+// resume normal scrolling. Touch follows the same scene stops without trapping
+// readers in the longer card and article sections.
+const introSceneIds=['hero','discover','roaming','pulse','echo','daily'];
+function introStops(){return introSceneIds.map(id=>({id,top:chapterTop(document.getElementById(id))}));}
+function nextIntroScene(direction){
+ const stops=introStops(),y=page.scrollTop,end=stops.at(-1).top;
+ if(direction>0&&y>=end-18)return null;
+ if(direction<0&&y>end+25)return null;
+ return direction>0
+  ?stops.find(stop=>stop.top>y+18)||null
+  :stops.findLast(stop=>stop.top<y-18)||null;
+}
+page.addEventListener('wheel',event=>{
+ if(!motionOK()||Math.abs(event.deltaY)<3||event.ctrlKey)return;
+ const target=nextIntroScene(event.deltaY);
+ if(!target)return;
+ event.preventDefault();
+ if(performance.now()<wheelLock)return;
+ goTo(target.id);
+},{passive:false});
+let touchStart=null;
+page.addEventListener('touchstart',event=>{
+ if(event.touches.length!==1)return;
+ touchStart={x:event.touches[0].clientX,y:event.touches[0].clientY,top:page.scrollTop};
+},{passive:true});
+page.addEventListener('touchmove',event=>{
+ if(!touchStart||!motionOK()||event.touches.length!==1)return;
+ const dx=event.touches[0].clientX-touchStart.x,dy=touchStart.y-event.touches[0].clientY;
+ if(Math.abs(dy)>8&&Math.abs(dy)>Math.abs(dx)*1.1&&nextIntroScene(dy))event.preventDefault();
+},{passive:false});
+page.addEventListener('touchend',event=>{
+ if(!touchStart)return;
+ const dy=touchStart.y-event.changedTouches[0].clientY,dx=touchStart.x-event.changedTouches[0].clientX;
+ if(motionOK()&&Math.abs(dy)>42&&Math.abs(dy)>Math.abs(dx)*1.1&&performance.now()>wheelLock){
+  const target=nextIntroScene(dy);
+  if(target)goTo(target.id);
+ }
+ touchStart=null;
+},{passive:true});
+page.addEventListener('touchcancel',()=>{touchStart=null;},{passive:true});
 
 const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');revealObserver.unobserve(entry.target);}}),{root:page,threshold:.12});
 $$('.reveal').forEach(el=>revealObserver.observe(el));
@@ -72,7 +111,7 @@ function updateScroll(){framePending=false;const y=page.scrollTop,h=page.clientH
  $('.hero').inert=p>.4;$('.discovery').inert=reveal<.8;
  $('.discovery-left').style.transform=`translateY(${(1-reveal)*70}px)`;$('.discovery-right').style.transform=`translateY(${(1-reveal)*100}px)`;
  $('.opening-axis').style.opacity=String(reveal);$('.orb-caption').style.opacity=String(reveal);
- document.body.classList.toggle('header-light',y>h*.35&& !['roaming','original','live','download'].includes(chapters[active].id));
+ document.body.classList.toggle('header-light',y>h*.35&& !['roaming','pulse','original','live','download'].includes(chapters[active].id));
  document.body.classList.toggle('header-hidden',y>h*.15&&y<1.2*h);
  if(motionOK()){
  cards.forEach((card,i)=>{const next=cards[i+1];if(!next){card.style.transform='none';return;}const amount=clamp((h*.82-next.getBoundingClientRect().top)/(h*.72));card.style.transform=`scale(${1-amount*.075}) rotate(${-amount*3}deg)`;});
@@ -130,10 +169,10 @@ $('#motionToggle').addEventListener('click',()=>{paused=!paused;applyMotion();})
 const ascii=$('#asciiCanvas'), actx=ascii.getContext('2d'), ambient=$('#ambientCanvas'),ctx=ambient.getContext('2d');
 const sample=document.createElement('canvas'),sctx=sample.getContext('2d',{willReadFrequently:true});
 const art=new Image();art.src='assets/sound-world.png';let pixels=null,cols=100,rows=60,W=1,H=1,DPR=1,mouse={x:.7,y:.5},pointer={x:.7,y:.5};
-function resizeCanvases(){W=page.clientWidth;H=page.clientHeight;DPR=Math.min(devicePixelRatio||1,1.5);[ascii,ambient].forEach(c=>{c.width=W*DPR;c.height=H*DPR;});actx.setTransform(DPR,0,0,DPR,0,0);ctx.setTransform(DPR,0,0,DPR,0,0);cols=Math.floor(W/12);rows=Math.floor(H/14);sample.width=cols;sample.height=rows;if(art.complete&&art.naturalWidth){sctx.drawImage(art,0,0,cols,rows);pixels=sctx.getImageData(0,0,cols,rows).data;}}
+function resizeCanvases(){W=page.clientWidth;H=page.clientHeight;const narrow=W<=800;DPR=Math.min(devicePixelRatio||1,narrow?1:1.5);[ascii,ambient].forEach(c=>{c.width=W*DPR;c.height=H*DPR;});actx.setTransform(DPR,0,0,DPR,0,0);ctx.setTransform(DPR,0,0,DPR,0,0);cols=Math.floor(W/(narrow?18:12));rows=Math.floor(H/(narrow?19:14));sample.width=cols;sample.height=rows;if(art.complete&&art.naturalWidth){sctx.drawImage(art,0,0,cols,rows);pixels=sctx.getImageData(0,0,cols,rows).data;}}
 art.addEventListener('load',resizeCanvases);window.addEventListener('resize',resizeCanvases);resizeCanvases();
 page.addEventListener('pointermove',e=>{pointer.x=e.clientX/W;pointer.y=e.clientY/H;},{passive:true});let last=0,time=0;
-function draw(now){requestAnimationFrame(draw);if(document.hidden||now-last<42)return;const dt=Math.min((now-last)/1000,.08);last=now;if(motionOK())time+=dt;mouse.x+=(pointer.x-mouse.x)*.09;mouse.y+=(pointer.y-mouse.y)*.09;
+function draw(now){requestAnimationFrame(draw);if(document.hidden||now-last<(W<=800?80:42))return;const dt=Math.min((now-last)/1000,.08);last=now;if(motionOK())time+=dt;mouse.x+=(pointer.x-mouse.x)*.09;mouse.y+=(pointer.y-mouse.y)*.09;
  if(active===0){ctx.clearRect(0,0,W,H);for(let i=0;i<65;i++){const a=i*2.39+time*.024,r=H*(.22+(i%17)*.009);const x=W*.67+Math.cos(a)*r+(mouse.x-.5)*10,y=H*.5+Math.sin(a)*r;ctx.fillStyle=`rgba(255,66,74,${.1+(Math.sin(time+i)+1)*.1})`;ctx.beginPath();ctx.arc(x,y,i%8?1:1.8,0,Math.PI*2);ctx.fill();}}
  if(active===2&&pixels){actx.clearRect(0,0,W,H);actx.fillStyle='#080505';actx.fillRect(0,0,W,H);actx.font='11px monospace';const chars=' .:+*#MUSIC';for(let y=0;y<rows;y++){for(let x=0;x<cols;x++){const index=(y*cols+x)*4,light=(pixels[index]*.7+pixels[index+1]*.2+pixels[index+2]*.1)/255;const nx=x/cols,ny=y/rows;const dist=Math.hypot(nx-mouse.x,ny-mouse.y);const ripple=motionOK()?Math.sin(dist*27-time*3.2)*Math.exp(-dist*4)*16:0;const flow=motionOK()?Math.sin(y*.16+time*.4)*5:0;const value=clamp(light*1.3+.07*Math.sin(x*.15+y*.2+time));if(value<.065)continue;actx.fillStyle=`rgba(${130+Math.floor(value*125)},${20+Math.floor(value*45)},${35+Math.floor(value*50)},${.18+value*.8})`;actx.fillText(chars[Math.min(chars.length-1,Math.floor(value*chars.length))],x*W/cols+flow,y*H/rows+ripple);}}}
 }
@@ -142,4 +181,4 @@ const tagline=$('.roaming-copy>p:not(.eyebrow)');
 tagline.setAttribute('aria-label','不必提前想好下一首。从此刻的心情出发，让旋律带路。');
 tagline.innerHTML='<span class="word-reveal" aria-hidden="true">不必提前</span><span class="word-reveal" aria-hidden="true">想好下一首。</span><br><span class="word-reveal" aria-hidden="true">从此刻的心情出发，</span><span class="word-reveal" aria-hidden="true">让旋律带路。</span>';
 updateScroll();
-if(location.hash){const id=decodeURIComponent(location.hash.slice(1));if(document.getElementById(id))requestAnimationFrame(()=>goTo(id));}
+window.addEventListener('pageshow',()=>{const id=decodeURIComponent(location.hash.slice(1));if(document.getElementById(id))goTo(id);});
