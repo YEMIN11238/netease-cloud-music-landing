@@ -70,6 +70,21 @@
   }
   document.querySelector('#echoPrevious').addEventListener('click', () => changeEcho(-1));
   document.querySelector('#echoNext').addEventListener('click', () => changeEcho(1));
+  // Horizontal swipes change the record without taking over vertical page scroll.
+  let echoSwipeStart = null;
+  const echoCoverWrap = document.querySelector('.echo-cover-wrap');
+  echoCoverWrap.addEventListener('touchstart', event => {
+    if (event.touches.length !== 1) return;
+    echoSwipeStart = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+  }, { passive: true });
+  echoCoverWrap.addEventListener('touchend', event => {
+    if (!echoSwipeStart || !event.changedTouches.length) return;
+    const dx = event.changedTouches[0].clientX - echoSwipeStart.x;
+    const dy = event.changedTouches[0].clientY - echoSwipeStart.y;
+    if (Math.abs(dx) > 42 && Math.abs(dx) > Math.abs(dy) * 1.35) changeEcho(dx < 0 ? 1 : -1);
+    echoSwipeStart = null;
+  }, { passive: true });
+  echoCoverWrap.addEventListener('touchcancel', () => { echoSwipeStart = null; }, { passive: true });
 
   const page = document.querySelector('#page');
   const scenes = [document.querySelector('#pulse'), document.querySelector('#echo'), document.querySelector('#encore')];

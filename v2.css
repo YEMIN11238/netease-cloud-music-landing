@@ -63,6 +63,7 @@ html .encore-bottom a:hover{color:#e72b36;letter-spacing:.03em}
 
 @keyframes echo-float{from{translate:-9px 8px;scale:.94}to{translate:18px -14px;scale:1.05}}
 @keyframes echo-cover-float{from{translate:0 6px}to{translate:0 -10px}}
+@keyframes mobile-record-light{from{transform:translateX(-12%) rotate(-4deg);opacity:.35}to{transform:translateX(12%) rotate(4deg);opacity:.65}}
 
 @media(max-width:1023px){html .page{min-width:0}}
 @media(max-width:800px){
@@ -217,6 +218,12 @@ html .encore-bottom a:hover{color:#e72b36;letter-spacing:.03em}
   html .artist-dialog>img{height:min(43svh,350px)}
   html .artist-dialog>div{padding:30px 22px}
   html .credits-dialog{padding:50px 24px 30px}
+  html .motion-toggle,html .menu-button{min-height:44px}
+  html .hero-next span,html .scroll-prompt span,html .scene-next span{width:44px;height:44px}
+  html .echo-controls button{width:48px;height:48px}
+  html .echo-cover-wrap{touch-action:pan-y}
+  html .collection-intro nav a{min-height:44px}
+  html .orb-shade::after{content:"";position:absolute;inset:-8% -35%;pointer-events:none;background:linear-gradient(110deg,transparent 28%,#fff2 43%,#ffd7bf3d 48%,transparent 62%);mix-blend-mode:screen;animation:mobile-record-light 9s ease-in-out infinite alternate}
 
   html .encore-scene{padding:82px 6vw 35px}
   html .encore-scene .scene-top{top:auto;left:auto;right:auto}
@@ -236,7 +243,9 @@ html .encore-bottom a:hover{color:#e72b36;letter-spacing:.03em}
   html .section-top span:last-child{display:none}
   html .hero h1{font-size:16vw}
   html .hero-bottom>p{font-size:19px}
-  html .hero-next{max-width:125px}
+  html .hero-next{max-width:none;white-space:nowrap}
+  html .header-actions,html .menu-button{flex-shrink:0}
+  html .menu-button{white-space:nowrap}
   html .discovery h2{font-size:8vw}
   html .discovery h3{font-size:17px}
   html .discovery-side>p:not(.pill-label){font-size:14px}
@@ -247,10 +256,21 @@ html .encore-bottom a:hover{color:#e72b36;letter-spacing:.03em}
   html .echo-bottom{justify-content:flex-end}
   html .chapter-menu #menuLinks a{font-size:19px}
 }
+@media(max-width:360px){
+  html body>.site-header{padding-left:10px;padding-right:10px}
+  html body.header-floating>.site-header{left:5px;right:5px;padding-left:9px;padding-right:9px}
+  html .official-wordmark{width:132px;gap:1px;flex-shrink:0}
+  html .brand-symbol{width:27px;height:27px}
+  html .brand-name{scale:.76}
+  html .header-actions{gap:3px}
+  html .motion-toggle{font-size:10px;padding-left:2px;padding-right:2px}
+  html .menu-button{padding-left:9px;padding-right:9px}
+}
 html body.motion-paused .pulse-curtain{transform:translateY(-125%) skewY(-9deg)!important}
 html body.motion-paused .pulse-copy,html body.motion-paused .echo-copy{opacity:1!important;transform:none!important}
 html body.motion-paused .encore-gallery article{clip-path:none!important;transform:none!important}
 html body.motion-paused .echo-orb,html body.motion-paused .echo-cover-wrap{animation:none!important}
+html body.motion-paused .orb-shade,html body.motion-paused .orb-shade::after{animation:none!important}
 html body.motion-paused .pulse-art{translate:0 0!important;transition:none!important}
 html body.motion-paused .pulse-giant,html body.motion-paused .echo-giant{transform:none!important}
 @media(prefers-reduced-motion:reduce){
@@ -258,6 +278,78 @@ html body.motion-paused .pulse-giant,html body.motion-paused .echo-giant{transfo
   html .pulse-copy,html .echo-copy{opacity:1!important;transform:none!important}
   html .encore-gallery article{clip-path:none!important;transform:none!important}
   html .echo-orb,html .echo-cover-wrap{animation:none!important}
+  html .orb-shade,html .orb-shade::after{animation:none!important}
   html .pulse-art{translate:0 0!important}
   html .pulse-giant,html .echo-giant{transform:none!important}
+}
+
+/* Touch-first counterparts to the desktop's floating covers and type runner. */
+@media(max-width:800px){
+  html body .collection-intro nav{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:9px;
+    margin:27px 0 35px;
+  }
+  html body .collection-intro nav a{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+    min-height:58px;
+    padding:6px 8px 6px 14px;
+    gap:12px;
+    border:1px solid #25272926;
+    border-radius:7px;
+    background:#fff9;
+    color:#252729;
+    font-size:14px;
+    line-height:1.35;
+    opacity:1;
+    transition:background .25s ease,translate .3s cubic-bezier(.16,1,.3,1);
+  }
+  html body .collection-intro nav a::before{display:none}
+  html body .collection-intro nav a::after{
+    content:'↗';
+    display:grid;
+    flex:0 0 44px;
+    place-items:center;
+    width:44px;
+    height:44px;
+    border:2px solid #fff;
+    border-radius:5px;
+    background-position:center;
+    background-size:cover;
+    box-shadow:0 3px 10px #25272925;
+    color:#fff;
+    font-size:20px;
+    text-shadow:0 1px 5px #000b;
+    transform:rotate(-5deg);
+    transition:transform .35s cubic-bezier(.16,1,.3,1);
+  }
+  html body .collection-intro nav a:nth-child(1)::after{background-image:linear-gradient(#0002,#0004),url('assets/album-xiaomeng.jpg')}
+  html body .collection-intro nav a:nth-child(2)::after{background-image:linear-gradient(#0002,#0004),url('assets/landlords-cat.jpg')}
+  html body .collection-intro nav a:nth-child(3)::after{background-image:linear-gradient(#0002,#0004),url('assets/album-xiaowang.jpg')}
+  html body .collection-intro nav a:active,
+  html body .collection-intro nav a:focus-visible{background:#fff;translate:0 -2px}
+  html body .collection-intro nav a:active::after,
+  html body .collection-intro nav a:focus-visible::after{transform:rotate(5deg) scale(1.08)}
+
+  html body .gp-community-runner{
+    position:relative;
+    display:flex;
+    top:auto;
+    left:auto;
+    width:calc(100% + 12vw);
+    height:40px;
+    margin:0 -6vw 26px;
+    opacity:.7;
+  }
+  html body .gp-community-runner__track{animation-duration:34s}
+  html body .gp-community-runner__track span{font-size:38px}
+}
+@media(prefers-reduced-motion:reduce){
+  html body .collection-intro nav a,
+  html body .collection-intro nav a::after{transition:none!important}
+  html body .gp-community-runner__track{animation:none!important}
 }

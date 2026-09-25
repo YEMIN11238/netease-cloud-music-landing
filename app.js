@@ -71,10 +71,15 @@ page.addEventListener('touchstart',()=>{cancelScrollAnimation();clearTimeout(sna
 
 const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');revealObserver.unobserve(entry.target);}}),{root:page,threshold:.12});
 $$('.reveal').forEach(el=>revealObserver.observe(el));
-const entered=new Set();
+const entered=new Set(),nodeEntranceAnimations=new Set();
 function animateChapter(section){if(entered.has(section.id))return;entered.add(section.id);if(section.id==='hero')animate('.headline-line',{x:(_,i)=>[i%2?140:-140,0],y:[40,0],opacity:[0,1],duration:1400,delay:window.anime?anime.stagger(150):0,ease:'outExpo'});
  if(section.id==='roaming'){animate('.cargo-title>span',{x:(_,i)=>[i%2?900:-900,0],opacity:[0,1],duration:1100,delay:window.anime?anime.stagger(130):0,ease:'outExpo'});animate('.word-reveal',{y:['100%',0],rotateX:[45,0],opacity:[0,1],duration:800,delay:window.anime?anime.stagger(80,{start:350}):0,ease:'outExpo'});scramble();}
- if(section.id==='connections')animate('.map-node',{scale:[.2,1],opacity:[0,1],delay:window.anime?anime.stagger(120):0,duration:1300,ease:'outElastic(1, .6)'});
+ if(section.id==='connections'&&motionOK())$$('.map-node').forEach((node,i)=>{
+  // Animate the individual scale property, leaving the positioning transform intact.
+  const entrance=node.animate([{scale:.2,opacity:0},{scale:1,opacity:1}],{duration:950,delay:i*120,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'});
+  nodeEntranceAnimations.add(entrance);
+  entrance.addEventListener('finish',()=>{nodeEntranceAnimations.delete(entrance);entrance.cancel();},{once:true});
+ });
 }
 let framePending=false;const cards=$$('.stack-card'),parallax=$$('[data-parallax]'),heroArtwork=$('.hero-art'),openingStage=$('.opening-stage');
 function recordFocalPoint(width,height){
@@ -103,9 +108,12 @@ function updateScroll(){framePending=false;const y=page.scrollTop,h=page.clientH
  openingStage.style.setProperty('--record-cx',`${centerX.toFixed(2)}px`);
  openingStage.style.setProperty('--record-cy',`${centerY.toFixed(2)}px`);
  openingStage.style.setProperty('--record-radius',`${orbRadius.toFixed(2)}px`);
- $('.hero').style.opacity=String(1-clamp(p*3));$('.hero').style.pointerEvents=p>.4?'none':'';
- const reveal=clamp((p-.73)/.27);$('.discovery').style.opacity=String(reveal);$('.discovery').style.pointerEvents=reveal>.8?'auto':'none';
- $('.hero').inert=p>.4;$('.discovery').inert=reveal<.8;
+ const mobileOpening=width<=800;
+ const heroAlpha=1-clamp(p*(mobileOpening?2.4:3));
+ const reveal=mobileOpening?clamp((p-.2)/.42):clamp((p-.73)/.27);
+ $('.hero').style.opacity=String(heroAlpha);$('.hero').style.pointerEvents=heroAlpha<.22?'none':'';
+ $('.discovery').style.opacity=String(reveal);$('.discovery').style.pointerEvents=reveal>.45?'auto':'none';
+ $('.hero').inert=heroAlpha<.22;$('.discovery').inert=reveal<=.45;
  $('.discovery-left').style.transform=`translateY(${(1-reveal)*70}px)`;$('.discovery-right').style.transform=`translateY(${(1-reveal)*100}px)`;
  $('.opening-axis').style.opacity=String(reveal);$('.orb-caption').style.opacity=String(reveal);
  document.body.classList.toggle('header-light',y>h*.35&& !['roaming','pulse','original','live','download'].includes(chapters[active].id));
@@ -160,7 +168,7 @@ $$('.artist-card').forEach(el=>{const portrait=$('.artist-portrait',el);el.addEv
 
 let scrambleHandle;function scramble(){if(!motionOK())return;const text='每一种热爱\n都有回响',chars='MUSIC+*#云音悦';let step=0;clearInterval(scrambleHandle);scrambleHandle=setInterval(()=>{step++;$('#scrambleText').textContent=[...text].map((ch,i)=>ch==='\n'?'\n':step>i*2+5?ch:chars[Math.floor(Math.random()*chars.length)]).join('');if(step>32){clearInterval(scrambleHandle);$('#scrambleText').textContent=text;}},45);}
 $('#scrambleText').style.whiteSpace='pre-line';
-function applyMotion(){document.body.classList.toggle('motion-paused',paused||reduce.matches);$('#motionToggle').setAttribute('aria-pressed',String(paused));$('#motionToggle').textContent=paused?'恢复动效':'暂停动效';if(paused){scrollAnimation?.cancel();scrollAnimation=null;page.style.scrollBehavior='';clearInterval(scrambleHandle);$('#scrambleText').textContent='每一种热爱\n都有回响';$$('.magnetic,.artist-portrait').forEach(el=>el.style.transform='');}if(window.anime)anime.engine.speed=paused?0:1;}
+function applyMotion(){document.body.classList.toggle('motion-paused',paused||reduce.matches);$('#motionToggle').setAttribute('aria-pressed',String(paused));$('#motionToggle').textContent=paused?'恢复动效':'暂停动效';if(paused){scrollAnimation?.cancel();scrollAnimation=null;page.style.scrollBehavior='';clearInterval(scrambleHandle);$('#scrambleText').textContent='每一种热爱\n都有回响';$$('.magnetic,.artist-portrait').forEach(el=>el.style.transform='');nodeEntranceAnimations.forEach(animation=>animation.cancel());nodeEntranceAnimations.clear();}if(window.anime)anime.engine.speed=paused?0:1;}
 $('#motionToggle').addEventListener('click',()=>{paused=!paused;applyMotion();});reduce.addEventListener('change',()=>{paused=reduce.matches;applyMotion();});applyMotion();
 
 // Original ASCII image field: source image luminance + wave deformation + pointer flow.
