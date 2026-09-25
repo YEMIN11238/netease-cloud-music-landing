@@ -1,6 +1,4 @@
-# Goodpatch-inspired PC revision (historical v1 note)
-
-This file describes the earlier desktop-only version. The current site also includes mobile layouts and 17 chapters; see `README.md`.
+# Goodpatch-inspired PC revision
 
 Reference: https://goodpatch.com/ja, visually reviewed 2026-09-24.
 
