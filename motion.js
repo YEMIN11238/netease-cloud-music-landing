@@ -10,7 +10,8 @@
   const canvas = document.querySelector('#heroMotionCanvas');
   const source = document.querySelector('.hero-art');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const gl = !reduced.matches && canvas.getContext('webgl', { alpha: false, antialias: false, powerPreference: 'low-power' });
+  const narrow = matchMedia('(max-width: 800px)');
+  const gl = !reduced.matches && !narrow.matches && canvas.getContext('webgl', { alpha: false, antialias: false, powerPreference: 'low-power' });
   const pointer = { x: .5, y: .5, strength: 0 };
   const smoothed = { x: .5, y: .5, strength: 0 };
   let lastFrame = 0;
@@ -136,7 +137,7 @@
     if (document.hidden || now - lastFrame < 31) return;
     const delta = Math.min((now - lastFrame) / 1000, .08);
     lastFrame = now;
-    const paused = reduced.matches || document.body.classList.contains('motion-paused');
+    const paused = reduced.matches || narrow.matches || document.body.classList.contains('motion-paused');
     const inScene = page.scrollTop < page.clientHeight * 2.6;
     canvas.style.visibility = paused ? 'hidden' : 'visible';
     if (paused || !inScene) {
